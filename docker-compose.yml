@@ -9,4 +9,3 @@ services:
                 - test-net
 networks:
   test-net:
-    driver: bridge
