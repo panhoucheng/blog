@@ -2,7 +2,7 @@ version: '3'
 services: 
   blog: 
 	build: .
-    image: jekyll/blog:latest
+        image: jekyll/blog:latest
 	ports: 
 		- "14000:4000"
 	networks:
