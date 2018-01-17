@@ -1,0 +1,49 @@
+# Basic
+title: XxBlog
+subtitle: knowledge
+welcome_message: # <a href="https://github.com/panhoucheng" target="_blank">flower me</a>
+description: 我叫潘潘，来自成都，是一名 Java,Python 开发者，爱好广泛，热爱各种新技术，致力成为一名全栈开发工程师。
+creator: <a href="http://xxblog.cn">@panhoucheng</a>
+
+url: "https://www.xxblog.cn"
+
+permalink: /:year/:month/:title/
+
+# Format
+highlighter: rouge
+
+# supported colors: blue, green, purple, red, orange or slate. If you need clear, leave it empty.
+cover_color: blue
+
+# The blog button should not be removed.
+blog_button:
+    title: Blog
+    description: Visit blog
+
+# Navigation buttons in the front page.
+nav:
+    - {title: Project, description: My Projects, url: 'https://github.com/panhoucheng'}
+    # - {title: Another Button, description: A button, url: 'http://example.com'}
+
+# Pagination
+gems: [jekyll-paginate]
+paginate: 10
+paginate_path: "page/:num/"
+
+# Comment
+comment:
+    disqus: vno-jekyll
+    # duoshuo: 
+    
+# Social
+social:
+    weibo: panhoucheng
+    github: panhoucheng
+    twitter: panhoucheng
+    gplus: 107108267983477358170
+    mail: admin@xxblog.cn
+
+# Google Analytics
+ga:
+    # id: your_ga_id
+    # host: your_host
