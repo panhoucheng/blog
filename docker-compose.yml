@@ -1,12 +1,12 @@
 version: '3'
 services: 
   blog: 
-	build: .
+        build: .
         image: jekyll/blog:latest
-	ports: 
-		- "14000:4000"
-	networks:
-		- test-net
+        ports: 
+                - "14000:4000"
+        networks:
+                - test-net
 networks:
   test-net:
     driver: bridge
