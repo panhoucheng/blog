@@ -2,7 +2,7 @@
 layout: post
 title: 基于Docker搭建Jekyll并实现自动部署 
 date: 2018-01-18 11:32:24.000000000 +09:00
-tags: Plan
+tags: devops
 ---
 ## 基于Docker搭建Jekyll并实现自动部署 
 
@@ -80,6 +80,6 @@ print('Serving HTTP on port 18000...')
 httpd.serve_forever()
 ```
 
-然后再通过 ` nohub python webhook.py &` 后台运行这个 python 程序就可以了。最好再把这条命令设置成开机启动。
+然后再通过 `nohub python webhook.py &` 后台运行这个 python 程序就可以了。最好再把这条命令设置成开机启动。
 
 教程完成，就当给自己记录一下吧。
