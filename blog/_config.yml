@@ -1,6 +1,6 @@
 # Basic
 title: XxBlog
-subtitle: knowledge
+subtitle: knowledge is power
 welcome_message: # <a href="https://github.com/panhoucheng" target="_blank">flower me</a>
 description: 我叫潘潘，来自成都，是一名 Java,Python 开发者，爱好广泛，热爱各种新技术，致力成为一名全栈开发工程师。
 creator: <a href="http://xxblog.cn">@panhoucheng</a>
@@ -32,7 +32,7 @@ paginate_path: "page/:num/"
 
 # Comment
 comment:
-    disqus: vno-jekyll
+    disqus: xxblog-1
     # duoshuo: 
     
 # Social
