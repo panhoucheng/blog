@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding=utf-8
 from wsgiref.simple_server import make_server
-import os
+import subprocess
 
 
 def application(environ, start_response):
     if environ['PATH_INFO'] == '/webhook/key/xxblog':
         start_response('200 OK', [('Content-Type', 'text/html')])
-        os.system('/mnt/blog/build.sh')
+        subprocess.Popen('/mnt/blog/build.sh')
         print('update success.')
         return [b'success, web hook!']
     else:
@@ -16,5 +16,5 @@ def application(environ, start_response):
 
 
 httpd = make_server('127.0.0.1', 18000, application)
-print('Serving HTTP on port 8000...')
+print('Serving HTTP on port 18000...')
 httpd.serve_forever()
