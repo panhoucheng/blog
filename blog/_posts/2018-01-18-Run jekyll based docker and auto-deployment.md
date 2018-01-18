@@ -4,7 +4,6 @@ title: 基于Docker搭建Jekyll并实现自动部署
 date: 2018-01-18 11:32:24.000000000 +09:00
 tags: devops
 ---
-## 基于Docker搭建Jekyll并实现自动部署 
 
 国内的服务器到期之后，博客就停了，最近打算重新启用起来，所以决定花了一天时间来重新搭建了一下。
 先上地址:[https://xxblog.cn](https://xxblog.cn "XxBlog")
