@@ -50,10 +50,9 @@ networks:
 说干就干，首先把更新文章，构建镜像然后启动这些步骤都写到一个 shell 文件里面去。
 ##### build.sh
 ```#!/bin/bash
-docker-compose down \
-        && git pull origin master \
+git pull origin master \
         && docker-compose build \
-        && docker-compose up -d
+        && docker-compose restart -d
 ```
 
 每次只需要执行以下./build.sh就可以实现自动更新，构建，重启了，但是这样还是需要手动登录到服务器执行命令，如果我们连这一步都想要省去 呢？ OK 配合 Git 的 Webhook就可以实现。
