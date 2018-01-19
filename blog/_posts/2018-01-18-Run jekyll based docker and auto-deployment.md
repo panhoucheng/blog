@@ -52,7 +52,7 @@ networks:
 ```#!/bin/bash
 git pull origin master \
         && docker-compose build \
-        && docker-compose restart -d
+        && docker-compose restart
 ```
 
 每次只需要执行以下./build.sh就可以实现自动更新，构建，重启了，但是这样还是需要手动登录到服务器执行命令，如果我们连这一步都想要省去 呢？ OK 配合 Git 的 Webhook就可以实现。
