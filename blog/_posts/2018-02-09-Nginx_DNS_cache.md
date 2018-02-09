@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Nginx 反向代理DNS缓存解决
+title: Nginx 反向代理DNS缓存问题
 date: 2018-02-09 11:32:24.000000000 +09:00
 tags: nginx dns cache
 ---
