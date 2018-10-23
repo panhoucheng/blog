@@ -35,7 +35,7 @@ comment:
     # disqus: xxblog-1
     # duoshuo: 
     valine: 
-        enable: true
+        status: enable
         appId: znjNEOsyO8ku94FLqSSiYPIB-gzGzoHsz
         appKey: mR4rmJp6QjfrIvzU0gEdVfcM
     
