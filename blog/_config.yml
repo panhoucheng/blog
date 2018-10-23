@@ -32,8 +32,12 @@ paginate_path: "page/:num/"
 
 # Comment
 comment:
-    disqus: xxblog-1
+    # disqus: xxblog-1
     # duoshuo: 
+    valine: 
+        enable: true
+        appId: znjNEOsyO8ku94FLqSSiYPIB-gzGzoHsz
+        appKey: mR4rmJp6QjfrIvzU0gEdVfcM
     
 # Social
 social:

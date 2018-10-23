@@ -31,6 +31,19 @@
             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
         })();
     </script>
+	
+  {% elsif site.valine.enable == 'true' %}
+	<div id="vcomments"></div>
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: {{ site.valine.appId }},
+            appKey: {{ site.valine.appKey }},
+			notify: true,
+			visitor: true
+        })
+    </script>
+
   {% endif %}
   
   
