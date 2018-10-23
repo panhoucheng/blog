@@ -32,13 +32,13 @@
         })();
     </script>
 	
-  {% elsif site.valine.enable == 'true' %}
+  {% elsif site.comment.valine.enable == 'true' %}
 	<div id="vcomments"></div>
     <script>
         new Valine({
             el: '#vcomments',
-            appId: {{ site.valine.appId }},
-            appKey: {{ site.valine.appKey }},
+            appId: {{ site.comment.valine.appId }},
+            appKey: {{ site.comment.valine.appKey }},
 			notify: true,
 			visitor: true
         })
