@@ -1,10 +1,10 @@
 ---
 layout: post
 title: Java日志框架
-date: 2019-04-30 16:32:24.000000000 +09:00
+author: Devpan
+date: 2019-04-30 16:32:24.000000000 +08:00
 tags: Java Log Frameworks Log4j Log4j2 Logback
 ---
-# Java日志框架
 
 Java 的日志框架多如牛毛，常见的有Apache Log4J, Apache Log4J2，Logback，我们如果选择一个高性能，易使用，对代码侵入性低的日志框架呢？
 首先说到日志框架，不得不提SLF4J, SLF4J提供了一个标准化的抽象API，大多数框架都遵守这种规范来实现API。这使您能够在不更改代码的情况下更改日志框架。我们只需要将依赖关系更改为实现SLF4J接口的不同框架。
