@@ -1,40 +1,63 @@
 ---
 layout: post
-title: MySQL Varchar(255)是一个好的选择吗？
-tag: MySQL mysql Varchar(255)
-date: 2019-10-11 16:32:24.000000000 +08:00
+title: 如何获取真实的客户端IP(防止客户端伪造)
+date: 2019-09-26 16:32:24.000000000 +08:00
 ---
 
-## 起因
-最近看到一个代码规范，突然想到我自己一般都用varchar(255)，但是一直想不通为什么要使用255这个长度。趁这个机会，把字段长度这块的知识汇总梳理一下。
+# 利用X-Forwarded-For伪造客户端IP漏洞成因及防范
 
+## 问题背景
+在Web应用开发中，经常会需要获取客户端IP地址。一个典型的例子就是投票系统，为了防止刷票，需要限制每个IP地址只能投票一次。
 
-## 为什么很多人会设置varchar(255)
-MySQL 4.1版本之前，varchar的最大长度是255 byte字节（也有一说是5.0.3版本之前）。这个版本发布都是2004年的事情了。惯性真恐怖，我不相信有多少系统是从2004年升级过来的。
+## 如何获取客户端IP
+在Java中，获取客户端IP最直接的方式就是使用 `request.getRemoteAddr()` ，这种方式能获取到连接服务器的客户端IP，在中间没有代理的情况下，的确是最简单有效的方式。但是目前互联网 Web 应用很少会将应用服务器直接对外提供服务，一般都会有一层Nginx做反向代理和负载均衡，有的甚至可能有多层代理。在有反向代理的情况下，直接使用`request.getRemoteAddr()`获取到的IP地址是Nginx所在服务器的IP地址，而不是客户端的IP。
 
+HTTP协议是基于TCP协议的，由于`request.getRemoteAddr()`获取到的是TCP层直接连接的客户端的IP，对于Web应用服务器来说直接连接它的客户端实际上是Nginx，也就是TCP层是拿不到真实客户端的IP。
+为了解决上面的问题，很多HTTP代理会在HTTP协议头中添加X-Forwarded-For头，用来追踪请求的来源。`X-Forwarded-For`的格式如下：
+```
+X-Forwarded-For: client1, proxy1, proxy2
+```
 
-## varchar(40)和varchar(255)有性能上的差别么？
-对于INNODB，varchar(40)和varchar(255)这两者在存放方式上完全一样：
-* 当长度小于255时，1byte用于保存长度.
-* 当长度大于等于256时，2byte用于保存长度.
+`X-Forwarded-For`包含多个IP地址，每个值通过逗号+空格分开，最左边（client1）是最原始客户端的IP地址，中间如果有多层代理，每一层代理会将连接它的客户端IP追加在X-Forwarded-For右边。
 
-实际的字符串存放在另外的位置，每个字符1 byte到4 byte不定（根据编码方式决定）。
-所以将一个字段从varchar(40)长度改成varchar(100)长度不会导致表的重建。但如果把长度从varchar(50)改成varchar(256)就不一样了，表示长度会需要用到2 byte。
+下面就是一种常用的获取客户端真实IP的方法，首先从HTTP头中获取X-Forwarded-For，如果X-Forwarded-For头存在就按逗号分隔取最左边第一个IP地址，不存在直接通过`request.getRemoteAddr()`获取IP地址：
+```
+public String getClientIp(HttpServletRequest request) { 
+    String xff = request.getHeader("X-Forwarded-For"); 
+    if (xff == null) { 
+        return request.getRemoteAddr();    
+    } else { 
+        return xff.contains(",") ? xff.split(",")[0] : xff;    
+    }
+}
+```
+另外，要让Nginx支持`X-Forwarded-For`头，需要配置：
+```
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+```
+`$proxy_add_x_forwarded_for`会将和Nginx直接连接的客户端IP追加在请求原有X-Forwarded-For值的右边。
+## 伪造X-Forwarded-For
 
-那我们就可以把255长度以下的字段的类型都设置成varchar(255)了呢？非也。内存表会介意。虽然我们不会明文创建内存表，但所有的中间结果都会被数据库引擎存放在内存表。而内存表会按照固定长度来保存。以utf-8编码为例，对于varchar(255)，每一行所占用的内存就是长度的2 byte + 3 * 255 byte。对于100条数据，光一个varchar字段就占约1GB内存。如果我们该用varchar(50)，就可以剩下来约80%的内存空间。
-除此之外，255长度也可能会引发一个索引的坑。MySQL在5.6版本及之前的最大长度是767 byte。但MySQL 5.5版本后开始支持4个byte的字符集utf8mb4。255 * 4 > 767，所以索引就放不下varchar(255)长度的字段了。虽然MySQL在5.7版本后将限制改成了3072 byte，但如果是多字段的联合索引还是有可能会超过这个限制。
+一般的客户端（例如浏览器）发送HTTP请求是没有`X-Forwarded-For`头的，当请求到达第一个代理服务器时，代理服务器会加上`X-Forwarded-For`请求头，并将值设为客户端的IP地址（也就是最左边第一个值），后面如果还有多个代理，会依次将IP追加到`X-Forwarded-For`头最右边，最终请求到达Web应用服务器，应用通过获取X-Forwarded-For头取左边第一个IP即为客户端真实IP。
 
-## varchar的最大长度是多少（ 最多能存多少字符）
+但是如果客户端在发起请求时，请求头上带上一个伪造的`X-Forwarded-For`，由于后续每层代理只会追加而不会覆盖，那么最终到达应用服务器时，获取的左边第一个IP地址将会是客户端伪造的IP。也就是上面的Java代码中`getClientIp()`方法获取的IP地址很有可能是伪造的IP地址，如果一个投票系统用这种方式做的IP限制，那么很容易会被刷票。
+伪造`X-Forwarded-For`头的方法很简单，例如Postman就可以轻松做到：
+![116a2a08b9abce4602a2c7ec61c3c74e.jpeg](http://image.xxblog.cn/blog/get_ip_by_java.jpg)
 
-varchar的最大长度是65535 字节（byte）= 64K，对所有的表都是一样的。
-* 字符类型若为英文字母，每个字符占1个字节，最大长度 (65535 - 2) = 65533
-* 字符类型若为GBK，每个字符最多占2个字节，最大长度 (65535 - 2) / 2 = 32766 余 1
-* 字符字符类型若为UTF-8，每个字符最多占3个字节，最大长度 (65535 - 2) / 3 = 21844 余 1
-* 字符字符类型若为Utfmb4，每个字符最多占4个字节，最大长度 (65535 - 2) / 4 = 16383 余 1
+当然你也可以写一段刷票程序或者脚本，每次请求时添加`X-Forwarded-For`头并随机生成一个IP来实现刷票的目的。
 
+## 如何防范
 
-## 定个规范
-* 名称字段：varchar(200)
-* 较长的名称字段/简介字段：varchar(500)
-* 特别长的描述字段： varchar(2000)
-* 超过2000中文字的字段：text
+在直接对外的Nginx反向代理服务器上配置：
+```
+proxy_set_header X-Forwarded-For $remote_addr;
+```
+如果有多层Nginx代理，内层的Nginx配置：
+```
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+```
+在最外层Nginx（即直接对外提供服务的Nginx）使用`$remote_addr`代替上面的`$proxy_add_x_forwarded_for`，可以防止伪造X-Forwarded-For。`$proxy_add_x_forwarded_for`会在原有`X-Forwarded-For`上追加IP，这就相当于给了伪造X-Forwarded-For的机会。而$remote_addr是获取的是直接TCP连接的客户端IP，这个是无法伪造的，即使客户端伪造也会被覆盖掉，而不是追加。
+
+需要注意的是，如果有多层代理，只在直接对外访问的Nginx上配置`X-Forwarded-For`为`$remote_addr`，内层的Nginx还是要配置为`$proxy_add_x_forwarded_for`，不然内层的Nginx又会覆盖掉客户端的真实IP。
+
+完成以上配置后，业务代码中再通过上面的`getClientIp()`方法，获取`X-Forwarded-For`最左边的IP地址即为真实的客户端地址，且客户端也无法伪造。
