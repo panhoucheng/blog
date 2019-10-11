@@ -387,9 +387,9 @@ hr {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(68, 68, 68, 0.6);
-  background-image: -webkit-linear-gradient(-410deg, rgba(68, 68, 68, 0.6) 20%, rgba(0, 0, 0, 0.9));
-  background-image: linear-gradient(140deg,rgba(68, 68, 68, 0.6) 20%, rgba(0, 0, 0, 0.9)); }
+  background-color: rgba(74, 87, 99, 0.6);
+  background-image: -webkit-linear-gradient(140deg,rgba(102, 132, 114, 0.18) 20%, rgba(45, 62, 41, 0.4));
+  background-image: linear-gradient(140deg,rgba(102, 132, 114, 0.18) 20%, rgba(45, 62, 41, 0.4)); }
 
 .panel-cover__logo {
   margin-bottom: .2em; }
